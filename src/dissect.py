@@ -2,7 +2,7 @@ import os
 import re
 
 
-def exists(src):
+def exists(src: str) -> str:
     """
     判断目录路径是否存在
     :param src: 目录路径
@@ -13,7 +13,7 @@ def exists(src):
     return src
 
 
-def listfiles(src):
+def listfiles(src: str) -> []:
     """
     列出目录下的所有文件。
     :param src: 目录路径
@@ -27,7 +27,11 @@ def listfiles(src):
     return filespath
 
 
-def filetype(src, pattern, dst):
+def mold(src: str) -> str:
+    return os.path.splitext(src)[1].split('.')[1]
+
+
+def filetype(src: str, pattern: str, dst: str) -> str:
     """
     分析文件类型是否与字符匹配。
     :param src: 文件路径
@@ -36,13 +40,13 @@ def filetype(src, pattern, dst):
     :return: 匹配成功返回该文件路径，且文件路径拼接该文件类型作为名称的目录；匹配失败返回None
     """
     dstdir = None
-    filetype = os.path.splitext(src)[1].split('.')[1]
+    filetype = mold(src)
     if pattern == filetype:
         dstdir = os.path.join(dst, filetype.upper())
     return dstdir
 
 
-def filename(src, pattern):
+def filename(src: str, pattern: str) -> str:
     """
     分析文件名是否与字符匹配。
     :param src: 文件路径
