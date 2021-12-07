@@ -1,5 +1,4 @@
 import os
-import pathlib
 import shutil
 import dissect
 import win32file
@@ -20,22 +19,15 @@ def pack(src: str, dst: str, pattern: str, zipname: str):
     :param pattern: 文件名称包含了 pattern 子串的文件。
     :param zipname: 归档文件的名称。
     """
-    # 列出 src 目录下所有的文件
     files = dissect.listfiles(src)
-    # 创建归档文件的根目录
     root_dir = dissect.exists(os.path.join(src, zipname))
-    # 创建归档文件的根目录的子目录
     base_dir = dissect.exists(os.path.join(src, zipname, zipname))
-    # 将匹配 pattern 子串的文件移动到归档文件的根目录之下
     for file in files:
         matched = dissect.filename(file, pattern)
         if matched:
             shutil.copy2(file, base_dir)
-    # 创建名为 base_name 的归档文件，并获得归档文件的路径
     zip_path = shutil.make_archive(zipname, 'zip', root_dir)
-    # 删除归档文件的根目录
     shutil.rmtree(root_dir)
-    # 将归档文件移动到 dist 目录下
     shutil.move(zip_path, dst)
 
 
@@ -46,14 +38,11 @@ def extractall(src: str, dst: str):
     :param dst: 提取 src 目录下的全部文件到 dst 目录下 。
     """
     dst_path = dissect.exists(dst)
-    # 列出 src 目录下的文件
     files = dissect.listfiles(src)
-    # 移动 src 目录下的文件
+
     if len(files) > 0:
         for file in files:
-            # 判断是否为 ini 文件
             if win32file.GetFileAttributes(file) != 38:
-                # dst 目录下的文件是否存在
                 dst_filename = os.path.split(file)[1]
                 dst_filepath = os.path.join(dst_path, dst_filename)
                 if os.path.exists(dst_filepath):
@@ -61,11 +50,8 @@ def extractall(src: str, dst: str):
                 else:
                     shutil.move(file, dst_path)
 
-    # 列出 src 目录下的文件夹
     dircs = dissect.listdirs(src)
-    # 如果 src 目录下还有子目录
     if len(dircs) > 0:
-        # 循环 src 目录下的子目录。
         for dirc in dircs:
             extractall(dirc, dst)
 
