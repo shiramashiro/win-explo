@@ -1,7 +1,8 @@
 import os
+import pathlib
 import shutil
 import dissect
-import zipfile
+import win32file
 from enum import Enum
 
 
@@ -36,6 +37,37 @@ def pack(src: str, dst: str, pattern: str, zipname: str):
     shutil.rmtree(root_dir)
     # 将归档文件移动到 dist 目录下
     shutil.move(zip_path, dst)
+
+
+def extractall(src: str, dst: str):
+    """
+    将 src 目录下以及子目录的文件全部提取到 dst 目录下。
+    :param src: 提取 src 目录下的全部文件。
+    :param dst: 提取 src 目录下的全部文件到 dst 目录下 。
+    """
+    dst_path = dissect.exists(dst)
+    # 列出 src 目录下的文件
+    files = dissect.listfiles(src)
+    # 移动 src 目录下的文件
+    if len(files) > 0:
+        for file in files:
+            # 判断是否为 ini 文件
+            if win32file.GetFileAttributes(file) != 38:
+                # dst 目录下的文件是否存在
+                dst_filename = os.path.split(file)[1]
+                dst_filepath = os.path.join(dst_path, dst_filename)
+                if os.path.exists(dst_filepath):
+                    os.remove(dst_filepath)
+                else:
+                    shutil.move(file, dst_path)
+
+    # 列出 src 目录下的文件夹
+    dircs = dissect.listdirs(src)
+    # 如果 src 目录下还有子目录
+    if len(dircs) > 0:
+        # 循环 src 目录下的子目录。
+        for dirc in dircs:
+            extractall(dirc, dst)
 
 
 def reform(src: str, dst: str, mode: Mode, pattern: str = None):

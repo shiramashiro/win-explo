@@ -27,6 +27,20 @@ def listfiles(src: str) -> []:
     return filespath
 
 
+def listdirs(src: str) -> []:
+    """
+    列出 src 目录下所有的目录
+    :param src: 列出 src 目录的所有目录
+    :return: 返回一组目录的绝对路径
+    """
+    dirspath = []
+    for item in os.listdir(src):
+        path = os.path.join(src, item)
+        if os.path.isdir(path):
+            dirspath.append(path)
+    return dirspath
+
+
 def mold(src: str) -> str:
     """
     获得文件的后缀名。
