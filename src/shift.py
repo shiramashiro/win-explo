@@ -31,24 +31,79 @@ def pack(src: str, dst: str, pattern: str, zipname: str):
     shutil.move(zip_path, dst)
 
 
+def extractname(src: str, dst: str, pattern: str):
+    """
+    将 src 目录下以及子目录中包含了 pattern 子串的文件名移动到 dst 目录下。
+    将会递归的扫描 src 目录，直到 src 子目录的子目录...没有目录为止。
+    :param src: 提取 src 目录下的全部文件。
+    :param dst: 提取 src 目录下的全部文件到 dst 目录下 。
+    :param pattern: 文件名包含了 pattern 子串。
+    """
+    files = dissect.listfiles(src)
+
+    if len(files) > 0:
+        for file in files:
+            if win32file.GetFileAttributes(file) != 38:
+                if dissect.filename(file, pattern):
+                    dst_filename = os.path.split(file)[1]
+                    dst_filepath = os.path.join(dissect.exists(dst), dst_filename)
+                    if os.path.exists(dst_filepath):
+                        os.remove(dst_filepath)
+                    else:
+                        shutil.move(file, dst)
+
+    dircs = dissect.listdirs(src)
+    if len(dircs) > 0:
+        for dirc in dircs:
+            extractname(dirc, dst, pattern)
+
+
+def extractype(src: str, dst: str, format: str):
+    """
+    将 src 目录下以及子目录中指定类型的文件提取到 dst 目录下。
+    将会递归的扫描 src 目录，直到 src 子目录的子目录...没有目录为止。
+    :param src: 提取 src 目录下的全部文件。
+    :param dst: 提取 src 目录下的全部文件到 dst 目录下 。
+    :param format: 文件类型。
+    :return:
+    """
+    files = dissect.listfiles(src)
+
+    if len(files) > 0:
+        for file in files:
+            if win32file.GetFileAttributes(file) != 38:
+                if dissect.filetype(file, format, dst):
+                    dst_filename = os.path.split(file)[1]
+                    dst_filepath = os.path.join(dissect.exists(dst), dst_filename)
+                    if os.path.exists(dst_filepath):
+                        os.remove(dst_filepath)
+                    else:
+                        shutil.move(file, dst)
+
+    dircs = dissect.listdirs(src)
+    if len(dircs) > 0:
+        for dirc in dircs:
+            extractype(dirc, dst, format)
+
+
 def extractall(src: str, dst: str):
     """
     将 src 目录下以及子目录的文件全部提取到 dst 目录下。
+    将会递归的扫描 src 目录，直到 src 子目录的子目录...没有目录为止。
     :param src: 提取 src 目录下的全部文件。
     :param dst: 提取 src 目录下的全部文件到 dst 目录下 。
     """
-    dst_path = dissect.exists(dst)
     files = dissect.listfiles(src)
 
     if len(files) > 0:
         for file in files:
             if win32file.GetFileAttributes(file) != 38:
                 dst_filename = os.path.split(file)[1]
-                dst_filepath = os.path.join(dst_path, dst_filename)
+                dst_filepath = os.path.join(dissect.exists(dst), dst_filename)
                 if os.path.exists(dst_filepath):
                     os.remove(dst_filepath)
                 else:
-                    shutil.move(file, dst_path)
+                    shutil.move(file, dst)
 
     dircs = dissect.listdirs(src)
     if len(dircs) > 0:
