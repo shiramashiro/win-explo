@@ -1,4 +1,4 @@
-import shift
+import modules.shift as shift
 
 
 def main():
