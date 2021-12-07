@@ -28,6 +28,11 @@ def listfiles(src: str) -> []:
 
 
 def mold(src: str) -> str:
+    """
+    获得文件的后缀名。
+    :param src: 文件路径
+    :return: 后缀名
+    """
     return os.path.splitext(src)[1].split('.')[1]
 
 

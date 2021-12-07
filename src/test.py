@@ -3,8 +3,8 @@ from shift import Mode
 
 
 def main():
-    shift.reform(src=r'E:\CommonFolders\Downloads', dst=r'E:\CommonFolders\Downloads',
-                 mode=Mode.NO_MODE)
+    shift.pack(src=r'E:\CommonFolders\Downloads', dst=r'E:\CommonFolders\Downloads\ZIP', pattern='承诺',
+               zipname='测试PY创建归档文件')
 
 
 if __name__ == '__main__':

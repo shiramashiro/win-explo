@@ -1,6 +1,7 @@
-import os.path
+import os
 import shutil
 import dissect
+import zipfile
 from enum import Enum
 
 
@@ -8,6 +9,33 @@ class Mode(Enum):
     BY_NAME = 'reform file by name.'
     BY_TYPE = 'reform file by type.'
     NO_MODE = 'not any mode, just move directly.'
+
+
+def pack(src: str, dst: str, pattern: str, zipname: str):
+    """
+    匹配 src 目录下文件名包含 pattern 子串的文件，并把所有文件打包成 zip 格式的归档文件，然后再将其移动到 dst 目录下保存。
+    :param src: 将 src 目录下的包含了 pattern 子串的文件进行压缩处理。
+    :param dst: 将归档文件移动到 dst 目录下保存。
+    :param pattern: 文件名称包含了 pattern 子串的文件。
+    :param zipname: 归档文件的名称。
+    """
+    # 列出 src 目录下所有的文件
+    files = dissect.listfiles(src)
+    # 创建归档文件的根目录
+    root_dir = dissect.exists(os.path.join(src, zipname))
+    # 创建归档文件的根目录的子目录
+    base_dir = dissect.exists(os.path.join(src, zipname, zipname))
+    # 将匹配 pattern 子串的文件移动到归档文件的根目录之下
+    for file in files:
+        matched = dissect.filename(file, pattern)
+        if matched:
+            shutil.copy2(file, base_dir)
+    # 创建名为 base_name 的归档文件，并获得归档文件的路径
+    zip_path = shutil.make_archive(zipname, 'zip', root_dir)
+    # 删除归档文件的根目录
+    shutil.rmtree(root_dir)
+    # 将归档文件移动到 dist 目录下
+    shutil.move(zip_path, dst)
 
 
 def reform(src: str, dst: str, mode: Mode, pattern: str = None):
